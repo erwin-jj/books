@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Your basket</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+ .logo-container {
+    position: relative;
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;  /* 👈 centers horizontally */
+    align-items: center;
+    gap: 50px;
+}
+
+.logo {
+    width: 130px;
+}
+
+.logo-text {
+    color: rgb(32, 27, 15);
+    font-size: 45px;
+    font-family: 'Great Vibes', cursive;
+    display: inline-block;  
+    transform: scaleX(1.7);
+}
+
+body {
+background-color: #f0d7c0;
+    font-family: Arial;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+#basket {
+    margin-top: 20px;
+}
+
+.item {
+    border-bottom: 1px solid #0f0f0f;
+    padding: 20px;
+}
+
+button {
+    margin-left: 20px;
+}
+.back-btn {
+    display: inline-block;
+    margin: 10px 0 20px;
+    padding: 10px 18px;
+    background: #111;
+    color: #f0d78c;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background: #1a2a7e;
+    color: white;
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body onload="displaybasket()">
+<h1>🛒 Your basket</h1>
+
+<a href="index.html" class="back-btn">← Back to Store</a>
+
+<div id="basket"></div>
+
+<h2 id="total">Total: $0</h2>
+
+<button onclick="buyNow()">💳 Buy Now</button>
+<div class="logo-container">
+    <img src="logo1.png" class="logo">
+    <span class="logo-text">ink & paper</span>
+</div>
+<script>
+let basket = JSON.parse(localStorage.getItem("basket")) || [];
+
+function displaybasket() {
+    let basketDiv = document.getElementById("basket");
+    let total = 0;
+
+    basketDiv.innerHTML = "";
+
+    if (basket.length === 0) {
+        basketDiv.innerHTML = "<p>Your basket is empty</p>";
+        document.getElementById("total").innerText = "Total: 0 DA";
+        return;
+    }
+
+    basket.forEach((item, index) => {
+        total += item.price * item.quantity;
+
+        basketDiv.innerHTML += `
+            <div class="item">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    ${item.price} DA
+                </div>
+
+                <div class="qty-controls">
+                    <button onclick="changeQty(${index}, -1)">-</button>
+                    ${item.quantity}
+                    <button onclick="changeQty(${index}, 1)">+</button>
+                </div>
+
+                <button class="remove-btn" onclick="removeItem(${index})">❌</button>
+            </div>
+        `;
+    });
+
+    document.getElementById("total").innerText = "Total: " + total + " DA";
+}
+
+function changeQty(index, change) {
+    basket[index].quantity += change;
+
+    if (basket[index].quantity <= 0) {
+        basket.splice(index, 1);
+    }
+
+    localStorage.setItem("basket", JSON.stringify(basket));
+    displaybasket();
+}
+
+function removeItem(index) {
+    basket.splice(index, 1);
+    localStorage.setItem("basket", JSON.stringify(basket));
+    displaybasket();
+}
+
+function buyNow() {
+    if (basket.length === 0) {
+        alert("Basket is empty!");
+        return;
+    }
+
+    let total = basket.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    alert("Order placed! Total: " + total + " DA");
+
+    basket = [];
+    localStorage.setItem("basket", JSON.stringify(basket));
+    displaybasket();
+}
+</script>
+
+</body>
+</html>
